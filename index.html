@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="description" content="38 Marvel films · 10 days · in-universe chronological order · ranked.">
+<meta property="og:title" content="MCU Marathon · 38 films in 10 days">
+<meta property="og:description" content="Every Marvel film watched in in-universe chronological order, ranked.">
+<meta property="og:image" content="https://image.tmdb.org/t/p/w780/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg">
+<meta property="og:url" content="https://marvel.joshmabry.dev">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<title>MCU Marathon · 38 films in 10 days</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── Header ─── */
+  .page-header {
+    text-align: center;
+    padding: clamp(40px, 10vw, 70px) 16px clamp(20px, 5vw, 30px);
+    background: radial-gradient(ellipse at top, #2a0a14 0%, #0a0a0f 70%);
+  }
+  .page-header h1 {
+    font-size: clamp(2rem, 9vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #ee1d52, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .page-header .subtitle {
+    color: #888;
+    margin-top: 10px;
+    font-size: clamp(0.85rem, 3vw, 1.05rem);
+  }
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: clamp(12px, 4vw, 32px);
+    margin-top: 22px;
+    color: #666;
+    font-size: clamp(0.65rem, 2.4vw, 0.8rem);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    flex-wrap: wrap;
+  }
+  .stats strong {
+    color: #ee1d52;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    display: block;
+  }
+
+  /* ─── Sticky toggle ─── */
+  .view-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 12px;
+    position: sticky;
+    top: 0;
+    background: rgba(10, 10, 15, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10;
+    border-bottom: 1px solid #15151f;
+  }
+  .toggle-btn {
+    background: #12121c;
+    color: #888;
+    border: 1px solid #1f1f30;
+    padding: 9px 18px;
+    border-radius: 24px;
+    font-family: inherit;
+    font-size: clamp(0.78rem, 2.6vw, 0.9rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .toggle-btn:hover { color: #ddd; border-color: #333; }
+  .toggle-btn.active {
+    background: linear-gradient(135deg, #ee1d52, #ff6b6b);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(238, 29, 82, 0.3);
+  }
+  .ratings-counter {
+    font-size: 0.72rem;
+    color: #555;
+    margin-left: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .ratings-counter strong { color: #ee1d52; }
+
+  /* ─── View ─── */
+  .view { display: none; padding: 24px 12px 60px; }
+  .view.active { display: block; }
+  .view-inner { max-width: 1300px; margin: 0 auto; }
+
+  /* ─── Movie Card ─── */
+  .movie-card {
+    transition: transform 0.2s;
+  }
+  .movie-card:hover { transform: translateY(-3px); }
+  .poster-wrap {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    background: #1a1a2e;
+  }
+  .poster-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .poster-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 7px;
+    border: 1px solid rgba(238, 29, 82, 0.2);
+    pointer-events: none;
+  }
+  .badge {
+    position: absolute;
+    top: 6px;
+    font-size: clamp(0.6rem, 2vw, 0.7rem);
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 10px;
+    z-index: 1;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .badge-rank {
+    left: 6px;
+    background: rgba(238, 29, 82, 0.95);
+    color: #fff;
+  }
+  .badge-watch {
+    right: 6px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ddd;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge-rating-top {
+    bottom: 6px;
+    right: 6px;
+    top: auto;
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffd700;
+    font-size: clamp(0.65rem, 2.2vw, 0.78rem);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .movie-card .title {
+    margin-top: 8px;
+    font-size: clamp(0.72rem, 2.4vw, 0.85rem);
+    font-weight: 600;
+    color: #ddd;
+    line-height: 1.3;
+  }
+  .movie-card .meta {
+    margin-top: 3px;
+    font-size: clamp(0.62rem, 2vw, 0.72rem);
+    color: #666;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .movie-card .phase {
+    color: #ee1d52;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    font-size: clamp(0.58rem, 1.9vw, 0.68rem);
+  }
+
+  /* ─── Star Rating ─── */
+  .stars {
+    margin-top: 6px;
+    display: flex;
+    gap: 1px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .star {
+    position: relative;
+    width: clamp(14px, 4.5vw, 18px);
+    height: clamp(14px, 4.5vw, 18px);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .star svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: #2a2a3a;
+    transition: fill 0.1s;
+  }
+  .star .star-fill {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .star .star-fill svg {
+    fill: #ffd700;
+  }
+  .star .half-l, .star .half-r {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+  }
+  .star .half-l { left: 0; }
+  .star .half-r { right: 0; }
+  .stars.previewing .star svg { fill: #2a2a3a; }
+  .stars-clear {
+    margin-left: 8px;
+    background: none;
+    border: none;
+    color: #444;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0 2px;
+    line-height: 1;
+  }
+  .stars-clear:hover { color: #888; }
+  .stars-row {
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+  }
+
+  /* ─── Franchise View ─── */
+  .franchise-row { margin-bottom: 36px; }
+  .franchise-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1a1a2e;
+  }
+  .franchise-rank {
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: 900;
+    color: #ee1d52;
+    line-height: 1;
+    min-width: 40px;
+  }
+  .franchise-name {
+    font-size: clamp(1rem, 3.6vw, 1.4rem);
+    font-weight: 700;
+    color: #fff;
+  }
+  .franchise-avg {
+    font-size: clamp(0.7rem, 2.4vw, 0.85rem);
+    color: #ffd700;
+    font-weight: 600;
+    margin-left: auto;
+  }
+  .franchise-count {
+    font-size: clamp(0.6rem, 2vw, 0.72rem);
+    color: #555;
+    background: #12121c;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .movie-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 0 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .movie-scroll .movie-card {
+    flex-shrink: 0;
+    width: clamp(120px, 38vw, 170px);
+    scroll-snap-align: start;
+  }
+  .movie-scroll::-webkit-scrollbar { height: 3px; }
+  .movie-scroll::-webkit-scrollbar-track { background: transparent; }
+  .movie-scroll::-webkit-scrollbar-thumb { background: #ee1d52; border-radius: 2px; }
+
+  /* ─── Chronological View ─── */
+  .day-section { margin-bottom: 32px; }
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 8px 0;
+  }
+  .day-number {
+    font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+    font-weight: 900;
+    color: #ee1d52;
+    background: rgba(238, 29, 82, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+  }
+  .day-date {
+    font-size: clamp(0.7rem, 2.4vw, 0.85rem);
+    color: #666;
+  }
+  .day-count {
+    margin-left: auto;
+    font-size: clamp(0.65rem, 2.2vw, 0.75rem);
+    color: #444;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .chrono-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 18px 12px;
+  }
+  @media (min-width: 600px) {
+    .chrono-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 22px 16px; }
+  }
+
+  /* ─── Ranked View (Top 38) ─── */
+  .ranked-tier {
+    margin-bottom: 36px;
+  }
+  .tier-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 8px 0;
+  }
+  .tier-label {
+    font-size: clamp(0.75rem, 2.6vw, 0.9rem);
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+  .tier-S { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #1a0a0a; }
+  .tier-A { background: rgba(238, 29, 82, 0.18); color: #ee1d52; }
+  .tier-B { background: rgba(120, 120, 200, 0.15); color: #8a8aff; }
+  .tier-C { background: rgba(255,255,255,0.06); color: #888; }
+  .tier-D { background: rgba(255,255,255,0.04); color: #555; }
+  .tier-U { background: rgba(255,255,255,0.03); color: #444; }
+  .tier-desc {
+    font-size: clamp(0.68rem, 2.2vw, 0.78rem);
+    color: #555;
+  }
+  .tier-count {
+    margin-left: auto;
+    font-size: clamp(0.65rem, 2.2vw, 0.75rem);
+    color: #444;
+  }
+  .ranked-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 18px 12px;
+  }
+  @media (min-width: 600px) {
+    .ranked-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 22px 16px; }
+  }
+  .badge-overall-rank {
+    background: rgba(0, 0, 0, 0.85);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    font-size: clamp(0.6rem, 2vw, 0.72rem);
+  }
+
+  /* ─── Footer ─── */
+  .footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: #333;
+    font-size: 0.75rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>MCU Marathon</h1>
+  <div class="subtitle">38 films · Apr 14 → Apr 25, 2026 · in-universe chronological</div>
+  <div class="stats">
+    <span><strong>38</strong>films</span>
+    <span><strong>10</strong>days</span>
+    <span><strong>~80h</strong>runtime</span>
+    <span><strong>3.43</strong>avg ★</span>
+  </div>
+</div>
+
+<div class="view-toggle">
+  <button class="toggle-btn active" data-view="chrono" onclick="switchView('chrono')">Chronological</button>
+  <button class="toggle-btn" data-view="ranked" onclick="switchView('ranked')">Top 38</button>
+  <button class="toggle-btn" data-view="franchise" onclick="switchView('franchise')">By Franchise</button>
+</div>
+
+<div class="view active" id="view-chrono"><div class="view-inner" id="chrono-content"></div></div>
+<div class="view" id="view-ranked"><div class="view-inner" id="ranked-content"></div></div>
+<div class="view" id="view-franchise"><div class="view-inner" id="franchise-content"></div></div>
+
+<div class="footer">marvel.joshmabry.dev</div>
+
+<script>
+  // ─── Data ─────────────────────────────────────────────────────────
+  const TMDB = (path) => `https://image.tmdb.org/t/p/w500${path}`;
+  const movies = [
+    { n: 1,  tmdb: 1771,   rating: 5,   poster: "/vSNxAJTlD0r02V9sPYpOjqDZXUK.jpg", title: "Captain America: The First Avenger", year: 2011, phase: "Phase 1", franchise: "Captain America", day: 1 },
+    { n: 2,  tmdb: 299537, rating: 0.5, poster: "/AtsgWhDnHTq68L0lLsUrCnM7TjG.jpg", title: "Captain Marvel",                     year: 2019, phase: "Phase 3", franchise: "Captain Marvel",  day: 1 },
+    { n: 3,  tmdb: 1726,   rating: 5,   poster: "/78lPtwv72eTNqFW9COBYI0dWDJa.jpg", title: "Iron Man",                           year: 2008, phase: "Phase 1", franchise: "Iron Man",        day: 1 },
+    { n: 4,  tmdb: 10138,  rating: 3,   poster: "/6WBeq4fCfn7AN0o21W9qNcRF2l9.jpg", title: "Iron Man 2",                         year: 2010, phase: "Phase 1", franchise: "Iron Man",        day: 2 },
+    { n: 5,  tmdb: 1724,   rating: 4,   poster: "/gKzYx79y0AQTL4UAk1cBQJ3nvrm.jpg", title: "The Incredible Hulk",                year: 2008, phase: "Phase 1", franchise: "Hulk",            day: 2 },
+    { n: 6,  tmdb: 10195,  rating: 4,   poster: "/prSfAi1xGrhLQNxVSUFh61xQ4Qy.jpg", title: "Thor",                               year: 2011, phase: "Phase 1", franchise: "Thor",            day: 2 },
+    { n: 7,  tmdb: 24428,  rating: 5,   poster: "/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg",  title: "The Avengers",                       year: 2012, phase: "Phase 1", franchise: "Avengers",        day: 2 },
+    { n: 8,  tmdb: 68721,  rating: 3.5, poster: "/qhPtAc1TKbMPqNvcdXSOn9Bn7hZ.jpg", title: "Iron Man 3",                         year: 2013, phase: "Phase 2", franchise: "Iron Man",        day: 2 },
+    { n: 9,  tmdb: 76338,  rating: 1.5, poster: "/wp6OxE4poJ4G7c0U2ZIXasTSMR7.jpg", title: "Thor: The Dark World",               year: 2013, phase: "Phase 2", franchise: "Thor",            day: 3 },
+    { n: 10, tmdb: 100402, rating: 4,   poster: "/tVFRpFw3xTedgPGqxW0AOI8Qhh0.jpg", title: "Captain America: The Winter Soldier",year: 2014, phase: "Phase 2", franchise: "Captain America", day: 3 },
+    { n: 11, tmdb: 118340, rating: 5,   poster: "/r7vmZjiyZw9rpJMQJdXpjgiCOk9.jpg", title: "Guardians of the Galaxy",            year: 2014, phase: "Phase 2", franchise: "Guardians",       day: 3 },
+    { n: 12, tmdb: 283995, rating: 5,   poster: "/y4MBh0EjBlMuOzv9axM4qJlmhzz.jpg", title: "Guardians of the Galaxy Vol. 2",     year: 2017, phase: "Phase 3", franchise: "Guardians",       day: 3 },
+    { n: 13, tmdb: 99861,  rating: 3.5, poster: "/4ssDuvEDkSArWEdyBl2X5EHvYKU.jpg", title: "Avengers: Age of Ultron",            year: 2015, phase: "Phase 2", franchise: "Avengers",        day: 4 },
+    { n: 14, tmdb: 102899, rating: 3,   poster: "/rQRnQfUl3kfp78nCWq8Ks04vnq1.jpg", title: "Ant-Man",                            year: 2015, phase: "Phase 2", franchise: "Ant-Man",         day: 4 },
+    { n: 15, tmdb: 271110, rating: 4.5, poster: "/rAGiXaUfPzY7CDEyNKUofk3Kw2e.jpg", title: "Captain America: Civil War",         year: 2016, phase: "Phase 3", franchise: "Captain America", day: 4 },
+    { n: 16, tmdb: 315635, rating: 5,   poster: "/c24sv2weTHPsmDa7jEMN0m2P3RT.jpg", title: "Spider-Man: Homecoming",             year: 2017, phase: "Phase 3", franchise: "Spider-Man",      day: 4 },
+    { n: 17, tmdb: 284052, rating: 3.5, poster: "/xf8PbyQcR5ucXErmZNzdKR0s8ya.jpg", title: "Doctor Strange",                     year: 2016, phase: "Phase 3", franchise: "Doctor Strange",  day: 4 },
+    { n: 18, tmdb: 284054, rating: 3.5, poster: "/uxzzxijgPIY7slzFvMotPv8wjKA.jpg", title: "Black Panther",                      year: 2018, phase: "Phase 3", franchise: "Black Panther",   day: 4 },
+    { n: 19, tmdb: 284053, rating: 5,   poster: "/rzRwTcFvttcN1ZpX2xv4j3tSdJu.jpg", title: "Thor: Ragnarok",                     year: 2017, phase: "Phase 3", franchise: "Thor",            day: 5 },
+    { n: 20, tmdb: 299536, rating: 4.5, poster: "/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg", title: "Avengers: Infinity War",             year: 2018, phase: "Phase 3", franchise: "Avengers",        day: 5 },
+    { n: 21, tmdb: 363088, rating: 2.5, poster: "/2mnK5VtjzYRWvQB1zLhZWtAJwzk.jpg", title: "Ant-Man and the Wasp",               year: 2018, phase: "Phase 3", franchise: "Ant-Man",         day: 6 },
+    { n: 22, tmdb: 299534, rating: 4,   poster: "/ulzhLuWrPK07P1YkdWQLZnQh1JL.jpg", title: "Avengers: Endgame",                  year: 2019, phase: "Phase 3", franchise: "Avengers",        day: 6 },
+    { n: 23, tmdb: 429617, rating: 5,   poster: "/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg",  title: "Spider-Man: Far From Home",          year: 2019, phase: "Phase 3", franchise: "Spider-Man",      day: 7 },
+    { n: 24, tmdb: 497698, rating: 3,   poster: "/7JPpIjhD2V0sKyFvhB9khUMa30d.jpg", title: "Black Widow",                        year: 2021, phase: "Phase 4", franchise: "Black Widow",     day: 7 },
+    { n: 25, tmdb: 566525, rating: 3.5, poster: "/9f2Q0U3IOsLgrI2HkvldwSABZy5.jpg", title: "Shang-Chi",                          year: 2021, phase: "Phase 4", franchise: "Shang-Chi",       day: 7 },
+    { n: 26, tmdb: 524434, rating: 1.5, poster: "/lFByFSLV5WDJEv3KabbdAF959F2.jpg", title: "Eternals",                           year: 2021, phase: "Phase 4", franchise: "Eternals",        day: 8 },
+    { n: 27, tmdb: 634649, rating: 2.5, poster: "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg", title: "Spider-Man: No Way Home",            year: 2021, phase: "Phase 4", franchise: "Spider-Man",      day: 8 },
+    { n: 28, tmdb: 453395, rating: 3.5, poster: "/ddJcSKbcp4rKZTmuyWaMhuwcfMz.jpg", title: "Doctor Strange in the Multiverse of Madness", year: 2022, phase: "Phase 4", franchise: "Doctor Strange", day: 8 },
+    { n: 29, tmdb: 616037, rating: 5,   poster: "/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg", title: "Thor: Love and Thunder",             year: 2022, phase: "Phase 4", franchise: "Thor",            day: 8 },
+    { n: 30, tmdb: 505642, rating: 3.5, poster: "/sv1xJUazXeYqALzczSZ3O6nkH75.jpg", title: "Black Panther: Wakanda Forever",     year: 2022, phase: "Phase 4", franchise: "Black Panther",   day: 8 },
+    { n: 31, tmdb: 640146, rating: 1,   poster: "/qnqGbB22YJ7dSs4o6M7exTpNxPz.jpg", title: "Ant-Man and the Wasp: Quantumania",  year: 2023, phase: "Phase 5", franchise: "Ant-Man",         day: 9 },
+    { n: 32, tmdb: 447365, rating: 4.5, poster: "/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg", title: "Guardians of the Galaxy Vol. 3",     year: 2023, phase: "Phase 5", franchise: "Guardians",       day: 9 },
+    { n: 33, tmdb: 609681, rating: 0.5, poster: "/9GBhzXMFjgcZ3FdR9w3bUMMTps5.jpg", title: "The Marvels",                        year: 2023, phase: "Phase 5", franchise: "Captain Marvel",  day: 9 },
+    { n: 34, tmdb: 293660, rating: 4,   poster: "/3E53WEZJqP6aM84D8CckXx4pIHw.jpg", title: "Deadpool",                           year: 2016, phase: "X-Force", franchise: "Deadpool",        day: 9 },
+    { n: 35, tmdb: 533535, rating: 4,   poster: "/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg", title: "Deadpool & Wolverine",               year: 2024, phase: "Phase 5", franchise: "Deadpool",        day: 10 },
+    { n: 36, tmdb: 822119, rating: 1,   poster: "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg", title: "Captain America: Brave New World",   year: 2025, phase: "Phase 5", franchise: "Captain America", day: 10 },
+    { n: 37, tmdb: 986056, rating: 1.5, poster: "/hqcexYHbiTBfDIdDWxrxPtVndBX.jpg", title: "Thunderbolts",                       year: 2025, phase: "Phase 5", franchise: "Thunderbolts",    day: 10 },
+    { n: 38, tmdb: 617126, rating: 2,   poster: "/abqOz6EL3yXyOOafCPZxjL1M5bQ.jpg", title: "The Fantastic 4: First Steps",       year: 2025, phase: "Phase 6", franchise: "Fantastic Four",  day: 10 },
+  ];
+
+  const dayDates = {
+    1: "Apr 14", 2: "Apr 15", 3: "Apr 16", 4: "Apr 17", 5: "Apr 18",
+    6: "Apr 19", 7: "Apr 20", 8: "Apr 22", 9: "Apr 23", 10: "Apr 24–25",
+  };
+
+  // ─── Ratings (baked into data) ────────────────────────────────────
+  const ratingByTmdb = Object.fromEntries(movies.map(m => [m.tmdb, m.rating]));
+  function getRating(tmdbId) { return ratingByTmdb[tmdbId] || 0; }
+
+  // ─── Star SVG ─────────────────────────────────────────────────────
+  const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
+
+  function renderStars(tmdbId) {
+    const rating = getRating(tmdbId);
+    let html = '<div class="stars">';
+    for (let i = 1; i <= 5; i++) {
+      const fillPct = Math.max(0, Math.min(1, rating - (i - 1))) * 100;
+      html += `
+        <div class="star">
+          ${STAR_SVG}
+          <div class="star-fill" style="width: ${fillPct}%">${STAR_SVG}</div>
+        </div>
+      `;
+    }
+    html += '</div>';
+    return `<div class="stars-row">${html}</div>`;
+  }
+
+  // ─── Render Card ──────────────────────────────────────────────────
+  function card(m, opts = {}) {
+    const rating = getRating(m.tmdb);
+    const ratingBadge = rating > 0
+      ? `<span class="badge badge-rating-top">★ ${rating.toFixed(1)}</span>`
+      : '';
+    const rankBadge = opts.rankBadge != null
+      ? `<span class="badge badge-rank">${opts.rankBadge}</span>` : '';
+    const watchBadge = opts.watchBadge != null
+      ? `<span class="badge badge-watch">${opts.watchBadge}</span>` : '';
+    return `
+      <div class="movie-card">
+        <div class="poster-wrap">
+          <img src="${TMDB(m.poster)}" alt="${m.title}" loading="lazy">
+          ${rankBadge}${watchBadge}${ratingBadge}
+        </div>
+        <div class="title">${m.title}</div>
+        <div class="meta"><span>${m.year}</span><span class="phase">${m.phase}</span></div>
+        ${renderStars(m.tmdb)}
+      </div>
+    `;
+  }
+
+  // ─── Render: Chronological View ───────────────────────────────────
+  function renderChrono() {
+    const days = {};
+    movies.forEach(m => {
+      if (!days[m.day]) days[m.day] = [];
+      days[m.day].push(m);
+    });
+    const html = Object.keys(days).sort((a,b)=>+a-+b).map(d => {
+      const list = days[d];
+      const cards = list.map(m => card(m, { rankBadge: m.n })).join('');
+      return `
+        <div class="day-section">
+          <div class="day-header">
+            <span class="day-number">DAY ${d}</span>
+            <span class="day-date">${dayDates[d] || ''}</span>
+            <span class="day-count">${list.length} film${list.length>1?'s':''}</span>
+          </div>
+          <div class="chrono-grid">${cards}</div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('chrono-content').innerHTML = html;
+  }
+
+  // ─── Render: Franchise View (sorted by avg rating desc) ──────────
+  function renderFranchise() {
+    const groups = {};
+    movies.forEach(m => {
+      if (!groups[m.franchise]) groups[m.franchise] = [];
+      groups[m.franchise].push(m);
+    });
+    const enriched = Object.entries(groups).map(([name, list]) => {
+      const rated = list.filter(m => getRating(m.tmdb) > 0);
+      const avg = rated.length ? rated.reduce((s,m) => s + getRating(m.tmdb), 0) / rated.length : 0;
+      // sort films within franchise by rating desc, unrated to end
+      const sortedList = [...list].sort((a,b) => (getRating(b.tmdb) || -1) - (getRating(a.tmdb) || -1));
+      return { name, list: sortedList, avg, count: list.length, ratedCount: rated.length };
+    });
+    // sort franchises by avg rating desc, unrated franchises by film count desc
+    enriched.sort((a,b) => {
+      if (a.avg !== b.avg) return b.avg - a.avg;
+      return b.count - a.count;
+    });
+    const html = enriched.map((g, i) => {
+      const cards = g.list.map((m, idx) => card(m, {
+        rankBadge: getRating(m.tmdb) > 0 ? `#${idx+1}` : null,
+        watchBadge: m.n,
+      })).join('');
+      const avgStr = g.avg > 0
+        ? `★ ${g.avg.toFixed(2)} avg`
+        : `<span style="color:#444">unrated</span>`;
+      return `
+        <div class="franchise-row">
+          <div class="franchise-header">
+            <span class="franchise-rank">#${i+1}</span>
+            <span class="franchise-name">${g.name}</span>
+            <span class="franchise-count">${g.count} film${g.count>1?'s':''}</span>
+            <span class="franchise-avg">${avgStr}</span>
+          </div>
+          <div class="movie-scroll">${cards}</div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('franchise-content').innerHTML = html;
+  }
+
+  // ─── Render: Ranked View (Top 38) ────────────────────────────────
+  function renderRanked() {
+    const sorted = [...movies].sort((a, b) => {
+      const ra = getRating(a.tmdb), rb = getRating(b.tmdb);
+      if (rb !== ra) return rb - ra;
+      return a.n - b.n; // tiebreak: chronological
+    });
+    // Tier definitions (S/A/B/C/D plus Unrated)
+    const tierFor = (r) => {
+      if (r === 0) return 'U';
+      if (r >= 4.5) return 'S';
+      if (r >= 4)   return 'A';
+      if (r >= 3)   return 'B';
+      if (r >= 2)   return 'C';
+      return 'D';
+    };
+    const tierMeta = {
+      S: { label: 'S TIER', desc: 'masterpieces (4.5–5★)' },
+      A: { label: 'A TIER', desc: 'great (4–4.5★)' },
+      B: { label: 'B TIER', desc: 'solid (3–3.5★)' },
+      C: { label: 'C TIER', desc: 'mid (2–2.5★)' },
+      D: { label: 'D TIER', desc: 'rough (0.5–1.5★)' },
+      U: { label: 'UNRATED', desc: 'awaiting verdict' },
+    };
+    const tiers = { S: [], A: [], B: [], C: [], D: [], U: [] };
+    sorted.forEach((m, i) => tiers[tierFor(getRating(m.tmdb))].push({ m, overall: i + 1 }));
+
+    // Only render tiers that have movies
+    const html = ['S', 'A', 'B', 'C', 'D', 'U']
+      .filter(t => tiers[t].length > 0)
+      .map(t => {
+        const meta = tierMeta[t];
+        const cards = tiers[t].map(({ m, overall }) => {
+          const rating = getRating(m.tmdb);
+          const overallBadge = rating > 0 ? `#${overall}` : null;
+          return card(m, {
+            rankBadge: overallBadge,
+            watchBadge: m.n,
+          });
+        }).join('');
+        return `
+          <div class="ranked-tier">
+            <div class="tier-header">
+              <span class="tier-label tier-${t}">${meta.label}</span>
+              <span class="tier-desc">${meta.desc}</span>
+              <span class="tier-count">${tiers[t].length} film${tiers[t].length>1?'s':''}</span>
+            </div>
+            <div class="ranked-grid">${cards}</div>
+          </div>
+        `;
+      }).join('');
+    document.getElementById('ranked-content').innerHTML = html;
+  }
+
+  function renderAll() { renderChrono(); renderRanked(); renderFranchise(); }
+
+  function switchView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.querySelector(`[data-view="${name}"]`).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  renderAll();
+</script>
+
+</body>
+</html>
