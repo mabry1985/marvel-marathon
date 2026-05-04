@@ -413,7 +413,7 @@
     <span><strong>38</strong>films</span>
     <span><strong>10</strong>days</span>
     <span><strong>~80h</strong>runtime</span>
-    <span><strong>3.43</strong>avg ★</span>
+    <span><strong id="avg-rating">—</strong>avg ★</span>
   </div>
 </div>
 
@@ -461,7 +461,7 @@
     { n: 23, tmdb: 429617, rating: 5,   poster: "/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg",  title: "Spider-Man: Far From Home",          year: 2019, phase: "Phase 3", franchise: "Spider-Man",      day: 7 },
     { n: 24, tmdb: 497698, rating: 2.5, poster: "/7JPpIjhD2V0sKyFvhB9khUMa30d.jpg", title: "Black Widow",                        year: 2021, phase: "Phase 4", franchise: "Black Widow",     day: 7 },
     { n: 25, tmdb: 566525, rating: 3.5, poster: "/9f2Q0U3IOsLgrI2HkvldwSABZy5.jpg", title: "Shang-Chi",                          year: 2021, phase: "Phase 4", franchise: "Shang-Chi",       day: 7 },
-    { n: 26, tmdb: 524434, rating: 1.5, poster: "/lFByFSLV5WDJEv3KabbdAF959F2.jpg", title: "Eternals",                           year: 2021, phase: "Phase 4", franchise: "Eternals",        day: 8 },
+    { n: 26, tmdb: 524434, rating: 0.5, poster: "/lFByFSLV5WDJEv3KabbdAF959F2.jpg", title: "Eternals",                           year: 2021, phase: "Phase 4", franchise: "Eternals",        day: 8 },
     { n: 27, tmdb: 634649, rating: 2.5, poster: "/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg", title: "Spider-Man: No Way Home",            year: 2021, phase: "Phase 4", franchise: "Spider-Man",      day: 8 },
     { n: 28, tmdb: 453395, rating: 3.5, poster: "/ddJcSKbcp4rKZTmuyWaMhuwcfMz.jpg", title: "Doctor Strange in the Multiverse of Madness", year: 2022, phase: "Phase 4", franchise: "Doctor Strange", day: 8 },
     { n: 29, tmdb: 616037, rating: 3,   poster: "/pIkRyD18kl4FhoCNQuWxWu5cBLM.jpg", title: "Thor: Love and Thunder",             year: 2022, phase: "Phase 4", franchise: "Thor",            day: 8 },
@@ -647,7 +647,12 @@
     document.getElementById('ranked-content').innerHTML = html;
   }
 
-  function renderAll() { renderChrono(); renderRanked(); renderFranchise(); }
+  function renderAvg() {
+    const sum = movies.reduce((s, m) => s + (m.rating || 0), 0);
+    const avg = sum / movies.length;
+    document.getElementById('avg-rating').textContent = avg.toFixed(2);
+  }
+  function renderAll() { renderChrono(); renderRanked(); renderFranchise(); renderAvg(); }
 
   function switchView(name) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
